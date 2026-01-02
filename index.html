@@ -4,7 +4,6 @@
   <meta charset="utf-8">
   <title>REFERIDOS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="manifest" href="manifest.webmanifest">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     :root{
@@ -306,23 +305,6 @@
       } catch (e){}
     }
 
-    if (window.Swal && typeof Swal.fire === 'function'){
-      var __fire = Swal.fire.bind(Swal);
-      Swal.fire = function(options){
-        var rest = Array.prototype.slice.call(arguments, 1);
-        try{
-          var icon = options && (options.icon || options.type);
-          if (icon && SOUNDS[icon]){
-            playSoundOnce(SOUNDS[icon]);
-          }
-          if (options && options.soundTag === 'login'){
-            playSoundOnce(SOUNDS.login);
-          }
-        } catch (e){}
-        return __fire.apply(Swal, concat([options], rest));
-      };
-    }
-
     function concat(){
       var out = '';
       var i;
@@ -332,6 +314,24 @@
       return out;
     }
 
+    // Wrapper de SweetAlert2 corregido (sin usar concat([options], rest))
+    if (window.Swal && typeof Swal.fire === 'function'){
+      var __fire = Swal.fire.bind(Swal);
+      Swal.fire = function(){
+        var options = arguments[0] || {};
+        try{
+          var icon = options.icon || options.type;
+          if (icon && SOUNDS[icon]){
+            playSoundOnce(SOUNDS[icon]);
+          }
+          if (options.soundTag === 'login'){
+            playSoundOnce(SOUNDS.login);
+          }
+        } catch (e){}
+        return __fire.apply(Swal, arguments);
+      };
+    }
+
     async function apiGet(action, params){
       startLoading();
       try{
@@ -339,11 +339,10 @@
         var sp = new URLSearchParams();
         sp.set('action', action);
         if (params){
-          var key;
           var keys = Object.keys(params);
           var i;
           for (i = 0; i < keys.length; i = i + 1){
-            key = keys[i];
+            var key = keys[i];
             sp.set(key, params[key]);
           }
         }
@@ -620,6 +619,13 @@
     });
 
     btnCompartir.addEventListener('click', function(){
+      Swal.fire({
+        icon: 'info',
+        title: 'Compartir',
+        text: 'Se abrirá WhatsApp para compartir la App.',
+        soundTag: 'login'
+      });
+
       var url = 'https://botheart911.github.io/af-listado/';
       var txt = concat(
         'Regístrate para apoyar con tus referidos. ',
