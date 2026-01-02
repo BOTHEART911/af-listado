@@ -120,7 +120,6 @@
     .hidden{
       display:none !important;
     }
-
     .btn-with-icon{
       display:flex;
       align-items:center;
@@ -134,7 +133,6 @@
       border-radius:4px;
       background:#fff;
     }
-
     .loader{
       position:fixed;
       inset:0;
@@ -188,7 +186,6 @@
     .spinner-ios i:nth-child(10){ transform:rotate(270deg) translateY(-24px); animation-delay:-0.2s; }
     .spinner-ios i:nth-child(11){ transform:rotate(300deg) translateY(-24px); animation-delay:-0.1s; }
     .spinner-ios i:nth-child(12){ transform:rotate(330deg) translateY(-24px); animation-delay:0s; }
-
     .view > *:first-child{
       margin-top:0 !important;
     }
@@ -238,8 +235,7 @@
         <label>Nombre Completo</label>
         <input id="reg-nombre" type="text" placeholder="Ingresa tu Nombre completo">
 
-        <label>Documento</label>
-        <input id="reg-documento" type="tel" inputmode="numeric" placeholder="Sin puntos ni espacios">
+        <!-- Ya no hay campo Documento aquí -->
 
         <label>Whatsapp</label>
         <input id="reg-telefono" type="tel" inputmode="numeric" placeholder="10 dígitos">
@@ -314,7 +310,6 @@
       return out;
     }
 
-    // Wrapper de SweetAlert2 corregido (sin usar concat([options], rest))
     if (window.Swal && typeof Swal.fire === 'function'){
       var __fire = Swal.fire.bind(Swal);
       Swal.fire = function(){
@@ -429,10 +424,6 @@
           return;
         }
         regCard.classList.remove('hidden');
-        var dInput = document.getElementById('reg-documento');
-        if (dInput){
-          dInput.value = documento;
-        }
         Swal.fire({
           icon: 'info',
           title: 'Nuevo Registro',
@@ -454,9 +445,10 @@
     });
 
     btnGuardarRegistro.addEventListener('click', async function(){
+      var documentoBase = String(docLogin.value || '').trim();
       var formData = {
         nombre: String(document.getElementById('reg-nombre').value || '').trim(),
-        documento: String(document.getElementById('reg-documento').value || '').trim(),
+        documento: documentoBase,
         telefono: String(document.getElementById('reg-telefono').value || '').trim(),
         referencia: String(document.getElementById('reg-referencia').value || '').trim()
       };
@@ -469,7 +461,7 @@
         Swal.fire({
           icon: 'warning',
           title: 'Faltan campos requeridos',
-          text: 'Completa Nombre, Documento, Whatsapp y N° Referido.'
+          text: 'Completa Nombre, Documento (en la parte superior), Whatsapp y N° Referido.'
         });
         return;
       }
@@ -488,7 +480,7 @@
         Swal.fire({
           icon: 'warning',
           title: 'Documento inválido',
-          text: 'Revisa el número de documento.'
+          text: 'Revisa el número de documento en la parte superior.'
         });
         return;
       }
@@ -542,7 +534,6 @@
           regCard.classList.add('hidden');
           docLogin.value = '';
           document.getElementById('reg-nombre').value = '';
-          document.getElementById('reg-documento').value = '';
           document.getElementById('reg-telefono').value = '';
           document.getElementById('reg-referencia').value = '';
           showView('view-login');
@@ -586,7 +577,7 @@
       }
 
       try{
-        var r = await apiGet('validarLider', { documento: documento });
+        var r = await apiGet('validarlider', { documento: documento });
         if (!r || !r.existe){
           await Swal.fire({
             icon: 'info',
